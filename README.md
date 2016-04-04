@@ -9,7 +9,7 @@ It is not intended for a production environment. It's main purpose is to be simp
 
 Besides this Client, you will also need:
 
-1. the RS app. You can find the Github repo here: [sample RS app]()
+1. the RS app. You can find the Github repo here: [sample RS app](https://github.com/mpguerra/address-book-app-stormpath)
 2. Access to a working Nginx server configured to manage the oAuth dance. You can test one here: [sample Nginx config and lua files](), and the tutorial will tell you what are the changes to apply to your Nginx config files.
 
 
