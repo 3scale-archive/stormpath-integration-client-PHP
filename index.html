@@ -2,210 +2,91 @@
 <html>
 
 <head>
-<link rel="stylesheet" type="text/css" href="3scale_idp.css">
-<style type="">
-	h1
+	<title>3scale-IDP Integration</title>
+	<link rel="stylesheet" type="text/css" href="https://stormpath-3scale.herokuapp.com/styles.css" media="screen">
+	<style>
+	@import "https://stormpath-3scale.herokuapp.com/styles.css "
+	</style>
+	
+
+	<script type="text/javascript">
+	  function draw()
+	  {
+	    var canvas = document.getElementById('3scale-stormpath');
+	    if (canvas.getContext){var ctx = canvas.getContext('2d'); }
+	  }
+	</script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+	<script>function get_token()
 	{
-		text-decoration: bold;
-		font-size: 17px;
-	}
+			var form_username = $("#username").val();
+			var form_password = $("#password").val();
+			var stormpath_app_id = $("#stormpath_app_id").val();
+			var stormpath_api_key = $("#stormpath_api_key").val();
+			var stormpath_api_secret = $("#stormpath_api_secret").val();
+			if (document.getElementById("through_3scale").checked)
+			{
+				console.log("Calling get_token through 3scale");
+				var threescale_service_id = $("#threescale_service_id").val();
+				var threescale_client_id = $("#threescale_client_id").val();
+				var threescale_client_secret = $("#threescale_client_secret").val();
+				var threescale_or_stormpath = "threescale";
+				$.get('request_token.php', { 
+						username:form_username,
+						password:form_password,
+						stormpath_app_id:stormpath_app_id,
+						stormpath_api_key:stormpath_api_key,
+						stormpath_api_secret:stormpath_api_secret,
+						threescale_client_id:threescale_client_id,
+						threescale_client_secret:threescale_client_secret,
+						threescale_or_stormpath:threescale_or_stormpath}, 
+						function(data){$("#token_value").val(data);});
+			}
+			else
+			{
+				console.log("Calling get_token directly to Stormpath");
+				var threescale_or_stormpath = "stormpath";
+				$.get('request_token.php', { 
+					username:form_username,
+					password:form_password,
+					stormpath_app_id:stormpath_app_id,
+					stormpath_api_key:stormpath_api_key,
+					stormpath_api_secret:stormpath_api_secret,
+					threescale_or_stormpath:threescale_or_stormpath}, 
+					function(data){$("#token_value").val(data);});
+			};
+	};
+	</script>
 
-	body
-	 { 
-	 margin: auto;
-	 }
-
-	 form
-	 {
-	 	margin:auto;
-	 }
-
-	label textarea{
-	 vertical-align: middle;
-	}
-
-
-	#oauth_flow
+	<script>function access_resources()
 	{
-		border: 1px solid #6e6e6e; 
-	 	margin-left:50px; 
-	 	padding:0; 
-	 	display:block; 
-	 	width:1024px; 
-	 	min-height:750px; 
-	}
-	 
-	 #newapp-authentication 
-	 { 
-		 width:49%; 
-		 height:255px;
-		 border: 1px solid #6e6e6e; 
-		  
-		 display:block; 
-		 float:left;
-		 padding:4px;
-
-	 }
-	 
-	 #newapp-authorization 
-	 { 
-		 width:49%; 
-		 height:475px;
-		 border: 1px solid #6e6e6e;  
-		 
-		 display:block; 
-		 float:left;
-		 padding:4px;
-	 }
-
-	 #address-book-authorization 
-	 { 
-	 	width:49%; 
-	 	height:475px;
-	 	border: 1px solid #6e6e6e; 
-	 	
-	 	display:block; 
-	 	float:right; 
-	 	padding:4px;
-	 }
-
-	  #stormpath-authentication 
-	 { 
-		 width:49%; 
-		 height:255px;
-		 border: 1px solid #6e6e6e; 
-		 
-		 display:block;
-		 float:right; 
-		 padding:4px;
-	 }
-
-	 #get_token_result
-	 {
-	 	width:70%;
-	 	height:1em;
-	 	float:right;
-	 }
-
-	 #token_value
-	 {
-	 	width:70%;
-	 	float:right;	
-	 }
-
-	 #get_token_details
-	 {
-	 	width:70%;
-	 	height:1em;
-	 	float:right;	
-	 }
-
-	 #form_wrapper
-	 {
-	 	width:100%;
-	 }
-
-	 #user_credentials
-	 {
-	 	float:left;
-	 	min-width:48%;
-	 }
-
-	 #grant_type
-	 {
-	 	float:left;
-	 	min-width:45%;
-	 }
-
-
-	#authenticate, #authorize
-	{
-		padding: 10px 15px;
-	    background: #4479BA;
-	    color: #FFF;
-		-webkit-border-radius: 4px;
-	    -moz-border-radius: 4px;
-	    border-radius: 4px;
-	    border: solid 1px #20538D;
-	    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
-	    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
-	    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
-	    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
-	}
-
-	#authorize
-	{
-		width:180px;
-	}
-
-	#authenticate:hover, #authenticate:focus {
-	    background: #356094;
-	    border: solid 1px #2A4E77;
-	    text-decoration: none;
-	}
-
-	#access_token
-	{
-		width:98%;
-	}
-
-	#authorize:hover, #authorize:focus {
-	    background: #356094;
-	    border: solid 1px #2A4E77;
-	    text-decoration: none;
-	}
-
-	#resources
-	{
-		width:98%;
-	}
-
-
-	#settings
-	{
-		border: 1px solid black; 
-	 	margin-left:50px; 
-	 	margin-top: 5px;
-	 	padding:5px; 
-	 	display:block; 
-	 	width:500px; 
-	 	min-height:200px;
-	}
-
-	.step
-	{
-		color: orange;
-	}
-</style>
-<meta charset="utf-8"/>
-<title>3scale-IDP Integration</title>
-
-<script type="text/javascript">
-  function draw()
-  {
-    var canvas = document.getElementById('3scale-stormpath');
-    if (canvas.getContext){var ctx = canvas.getContext('2d'); }
-  }
-</script>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-<script>function get_token()
-{
-		var form_username = $("#username").val();
-		var form_password = $("#password").val();
-		$.get('request_token.php', { username:form_username,password:form_password}, function(data){
-        $("#token_value").val(data);});
-};
-</script>
-
-<script>function access_resources()
-{
-		var form_access_token = $("#access_token").val();
-		$.get('authorize.php', { access_token:form_access_token}, function(data){
-        $("#resources").val(data);});
-};
-</script>
-
+			var form_access_token = $("#access_token").val();
+			var form_username = $("#username").val();
+			var form_password = $("#password").val();
+			var stormpath_app_id = $("#stormpath_app_id").val();
+			var stormpath_api_key = $("#stormpath_api_key").val();
+			var stormpath_api_secret = $("#stormpath_api_secret").val();
+			var threescale_or_stormpath = "stormpath";
+			if (document.getElementById("through_3scale").checked)
+			{
+				var threescale_app_id = $("#threescale_app_id").val();
+				var threescale_or_stormpath = "threescale";
+			}
+			
+			$.get('authorize.php', { 
+				access_token:form_access_token,
+				username:form_username,
+				password:form_password,
+				stormpath_app_id:stormpath_app_id,
+				stormpath_api_key:stormpath_api_key,
+				stormpath_api_secret:stormpath_api_secret,
+				threescale_or_stormpath:threescale_or_stormpath}, 
+				function(data){$("#resources").val(data);});
+			
+	};
+	</script>
 
 </head>
 
@@ -223,15 +104,16 @@
 					    <input type="hidden" value="a268377f" id="app_id"/>
 				    </div>
 				    
-				    <div id="grant_type">
-				    <h3 >GRANT TYPE</h3>
-					    <p><input type="radio" name="grant" value="password"> Password<br></p>
-		  				<p><input type="radio" name="grant" value="user_credentials"> User Credentials<br></p>
+				    <div id="call_target">
+				    <h3 >CALL TARGET</h3>
+					    <p><input type="radio" name="backend" id="through_3scale" value="3scale"> Through 3scale<br></p>
+		  				<p><input type="radio" name="backend" id="stormpath_directly" value="stormpath"> Directly to Stormpath<br></p>
 	  				</div>
 					
 	  			</div>
 			    <div id="get_token_button">
-			    	<p><input name="authenticate" id="authenticate" onclick="get_token();" value="Authenticate (Get Token)"></p>
+			    	<span><input name="authenticate" id="authenticate" onclick="get_token();" value="Authenticate (Get Token)"></span>
+			       	<span style="padding-left:40px;">(settings at the bottom)</span>
 			    </div>
 			</form>
 		</div>
@@ -258,17 +140,26 @@
 			<h1><span class="step">4.</span>Resources Server Response</h1>
 			<hr>
 			<h3>RESOURCES</h3>
-			<p><textarea value="" placeholder="<Resources (Contacts) returned by the RS (backend API)>" id="resources" rows="20"/></textarea></p>
+			<p><textarea value="" placeholder="<Resources (Contacts) returned by the RS (backend API)>" id="resources" rows="8"/></textarea></p>
 		</div>
 	</div>
 
 	<div id="settings">
-		<div id="3scale-settings">
-			<h1>3scale</h1>
+		<div id="threescale-settings">
+			<h1>3scale SETTINGS</h1>
 			<hr>
-			    <h3>SETTINGS</h3>
-			    <p><label>Service ID:<textarea value="" placeholder="service_id" id="service_id" rows="1"/>2555417729973</textarea></label></p>
-			    <p><label>APP ID:<textarea value="" placeholder="app_id" id="app_id" rows="1"/>a268377f</textarea></label></p>
+			    <p><label>CLIENT ID:<textarea value="" placeholder="3scale_client_id" id="threescale_client_id" rows="1"/></textarea></label></p>
+			    <p><label>CLIENT SECRET:<textarea value="" placeholder="3scale_client_secret" id="threescale_client_secret" rows="1"/></textarea></label></p>
+		</div>
+		<div id="stormpath-settings">
+			<h1>Stormpath SETTINGS</h1>
+			<hr>
+			    <p><label>App ID:<textarea value="" placeholder="stormpath_app_id" id="stormpath_app_id" rows="1"/></textarea></label></p>
+			    <p><label>API key:<textarea value="" placeholder="stormpath_api_key (FROM TENANT ACCOUNT)" id="stormpath_api_key" rows="1"/></textarea></label></p>
+			    <p><label>API Secret:<textarea value="" placeholder="stormpath_api_secret (FROM TENANT ACCOUNT)" id="stormpath_api_secret" 
+			    rows="1"/></textarea></label></p>
+
+
 		</div>
 	</div>
 </body>
