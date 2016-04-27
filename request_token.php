@@ -1,26 +1,42 @@
 <?php
-
+include_once "urlencode.php";
 require 'vendor/autoload.php';
-$keys = parse_ini_file(".stormpath/apiKey.properties", true);
 
+
+//Parsing all the variables from the form (passed as arguments to this script)
 $username=$_GET["username"];
 $password=$_GET["password"];
-$app_id="a268377f";
-$api_key=$keys["apiKey.id"];
-$api_secret=$keys["apiKey.secret"];
-/*$token=get_token_from_stormpath($username,$password, $api_key,$api_secret);*/
-$token=get_token_from_stormpath($username,$password, $app_id);
-echo $token;
-/*if we use the get_token_through_3scale there is no need to call the store token, as Nginx will also store the token in the same call */
-/*if we use the get_token_from_stormpath then we should comment out the line below so that the token is stored */
-/*store_access_token_3scale("ef452c01588e3f7875397cda19d5bc2d","2555417729973","a268377f",$token);*/
+$threescale_client_id="";
+$threescale_client_secret="";
+$stormpath_app_id=$_GET["stormpath_app_id"];
+$stormpath_api_key=$_GET["stormpath_api_key"];
+$stormpath_api_secret=$_GET["stormpath_api_secret"];
+$threescale_or_stormpath=$_GET["threescale_or_stormpath"];
 
-
-
-function get_token_through_3scale($username,$password, $app_id)
+//we check if we have to make the call directly to Stormpath or through 3scale
+if ($threescale_or_stormpath=="threescale")
 {
-	$sURL = "http://localhost/oauth/token";
-	$sPD = "grant_type=password&username=".$username."&password=".$password."&app_id=".$app_id; // The POST Data
+
+$threescale_client_id=$_GET["threescale_client_id"];
+$threescale_client_secret=$_GET["threescale_client_secret"];
+$token=get_token_through_3scale($username,$password, $threescale_client_id,$threescale_client_secret);
+}
+else
+{
+
+$token=get_token_from_stormpath($username,$password, $stormpath_api_key,$stormpath_api_secret,$stormpath_app_id);	
+}
+
+//we echo the token to the screen
+echo $token;
+
+
+
+function get_token_through_3scale($username,$password, $client_id,$client_secret)
+{
+	$sURL = "http://ec2-54-167-218-142.compute-1.amazonaws.com/oauth/token?";
+	$sPD = "username=".$username."&password=".$password."&client_id=".$client_id."&client_secret=".$client_secret; // The POST Data
+	
 	$aHTTP = array
 	  (
 	  'http' => 
@@ -33,16 +49,17 @@ function get_token_through_3scale($username,$password, $app_id)
 
 	$context = stream_context_create($aHTTP);
 	$contents = file_get_contents($sURL, false, $context);
-
 	$token=json_decode($contents,TRUE);
 
 	return($token["access_token"]);
 }
 
 
-function get_token_from_stormpath($username,$password, $api_key,$api_secret)
+function get_token_from_stormpath($username,$password, $stormpath_api_key,$stormpath_api_secret,$stormpath_app_id)
 {
-	$sURL = "https://".$api_key.":".$api_secret."@api.stormpath.com/v1/applications/22jMRtt7GeNyaQ3LQ4ZjrC/oauth/token";
+
+	
+	$sURL = "https://".$stormpath_api_key.":".myUrlEncode($stormpath_api_secret)."@api.stormpath.com/v1/applications/".$stormpath_app_id."/oauth/token";
 	$sPD = "grant_type=password&username=".$username."&password=".$password; // The POST Data
 	$aHTTP = array
 	  (
@@ -53,12 +70,11 @@ function get_token_from_stormpath($username,$password, $api_key,$api_secret)
 	    'content' => $sPD
 	  )
 	);
-
+	  
 	$context = stream_context_create($aHTTP);
 	$contents = file_get_contents($sURL, false, $context);
-
 	$token=json_decode($contents,TRUE);
-
+	
 	return($token["access_token"]);
 }
 
@@ -80,5 +96,6 @@ function store_access_token_3scale($provider_key, $service_id, $app_id, $access_
 	$context = stream_context_create($aHTTP);
 	$contents = file_get_contents($sURL, false, $context);
 }
+
 
 ?>
